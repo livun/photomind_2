@@ -79,3 +79,10 @@ body {
     font-size: 2.5rem;
   }
   
+  .col-md-8{
+    margin: auto;
+  }
+
+#meny{
+    width: 60%;
+  }
