@@ -1,10 +1,11 @@
-from flask import render_template, url_for, flash, redirect, request, Blueprint
+from flask import render_template, url_for, flash, redirect, request, Blueprint, Flask, session
 from flask_login import login_user, current_user, logout_user, login_required
 from photomind import db, bcrypt
 from photomind.models import User, Post
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
 from photomind.users.utils import save_picture, send_reset_email
+from datetime import timedelta
 
 users = Blueprint('users', __name__)
 
@@ -37,6 +38,7 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
+        session.permanent = True
     return render_template('login.html', title='Login', form=form)
 
 
@@ -77,6 +79,8 @@ def user_posts(username):
         .paginate(page=page, per_page=5)
     return render_template('user_posts.html', posts=posts, user=user)
 
+    
+
 
 @users.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
@@ -107,3 +111,5 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
+
+
