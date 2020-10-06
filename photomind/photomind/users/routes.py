@@ -2,11 +2,7 @@ from flask import render_template, url_for, flash, redirect, request, Blueprint,
 from flask_login import login_user, current_user, logout_user, login_required
 from photomind import db, bcrypt
 from photomind.models import User, Post
-<<<<<<< HEAD
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
-=======
-from photomind.users.forms import RegistrationForm, LoginForm, UpdateAccountForm
->>>>>>> 2be31bc5a8aca2e622fae05fc0fc705961274e21
 from photomind.users.utils import save_picture
 from datetime import timedelta
 from photomind.main.routes import session
@@ -21,7 +17,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        hashed_answer = bcrypt.generate_password_hash(form.answer.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password, question=form.question.data, answer=hashed_answer)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -57,7 +54,7 @@ def login():
     return render_template('login.html', title='Login', form=form)
 
 
-@users.newpassword("/newpassword", methods=['GET', 'POST'])
+@users.route("/newpassword", methods=['GET', 'POST'])
 def newpassword():
     form = NewPasswordForm()
     #if form.validate_on_submit():
