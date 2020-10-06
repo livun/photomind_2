@@ -19,6 +19,7 @@ def create_app(config_class=Config):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
     #app.config.from_object(Config)
     app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
+    app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB max-limit
 
     db.init_app(app)
     bcrypt.init_app(app)
