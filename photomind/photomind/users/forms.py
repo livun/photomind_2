@@ -66,11 +66,11 @@ class NewPasswordForm(FlaskForm):
                     validators=[DataRequired(), Email()])
     question = SelectField('Questions', choices = ["What was the house number and street name you lived in as a child?",
                 "What were the last four digits of your childhood telephone number?",
-                "What primary school did you attend?", "In what town or city was your first full time job?"
+                "What primary school did you attend?", "In what town or city was your first full time job?",
                 "What is the middle name of your oldest child?"], validators=[DataRequired()])
-    answer = PasswordField('Aswer', validators=[DataRequired()])
+    answer = StringField('Aswer', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = StringField('Confirm Password',
+    confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
 

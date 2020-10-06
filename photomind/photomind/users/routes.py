@@ -5,7 +5,6 @@ from photomind.models import User, Post
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
 from photomind.users.utils import save_picture
 from datetime import timedelta
-from photomind.main.routes import session
 
 users = Blueprint('users', __name__)
 
@@ -31,25 +30,14 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = LoginForm()
-    attempt= session.get('attempt')
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if attempt <= 0:
-            flash('You have used your limited attemts to login.')
-            session.permanent = False
-            return redirect(url_for('newpassword'))
-        elif user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
-        attempt -= 1
-        session['attempt']=attempt
-        print(attempt,flush=True)
-        if attempt==1:
-            client_ip= session.get('client_ip')
-            flash('This is your last attempt, %s will be blocked for 24hr, Attempt %d of 5'  % (client_ip,attempt), 'error')
         else:
-            flash('Login Unsuccessful. Please check email and password, Attempts %d of 5'  % attempt, 'error')
+            flash('Login Unsuccessful. Please check email and password.','error')
         session.permanent = True
     return render_template('login.html', title='Login', form=form)
 
@@ -57,8 +45,18 @@ def login():
 @users.route("/newpassword", methods=['GET', 'POST'])
 def newpassword():
     form = NewPasswordForm()
-    #if form.validate_on_submit():
-
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if bcrypt.check_password_hash(user.answer, form.answer.data) and user.question == form.question.data:
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            user.password = hashed_password
+            db.session.commit()
+            flash('Your password has been updated! You are now able to log in', 'success')
+            return redirect(url_for('users.login'))
+        else:
+            flash('New password unsuccesful. Please check you email, question and answer.', 'error')
+            return redirect(url_for('users.newpassword'))
+    return render_template('newpassword.html', title="New Password", form=form)
 
 @users.route("/logout")
 def logout():
