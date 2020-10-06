@@ -2,9 +2,8 @@ from flask import render_template, url_for, flash, redirect, request, Blueprint,
 from flask_login import login_user, current_user, logout_user, login_required
 from photomind import db, bcrypt
 from photomind.models import User, Post
-from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                   RequestResetForm, ResetPasswordForm)
-from photomind.users.utils import save_picture, send_reset_email
+from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
+from photomind.users.utils import save_picture
 from datetime import timedelta
 from photomind.main.routes import session
 
@@ -37,7 +36,7 @@ def login():
         if attempt <= 0:
             flash('You have used your limited attemts to login.')
             session.permanent = False
-            return redirect(url_for('main.home'))
+            return redirect(url_for('newpassword'))
         elif user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
@@ -50,10 +49,14 @@ def login():
             flash('This is your last attempt, %s will be blocked for 24hr, Attempt %d of 5'  % (client_ip,attempt), 'error')
         else:
             flash('Login Unsuccessful. Please check email and password, Attempts %d of 5'  % attempt, 'error')
-        #else:
-            #flash('Login Unsuccessful. Please check email and password', 'danger')
         session.permanent = True
     return render_template('login.html', title='Login', form=form)
+
+
+@users.newpassword("/newpassword", methods=['GET', 'POST'])
+def newpassword():
+    form = NewPasswordForm()
+    #if form.validate_on_submit():
 
 
 @users.route("/logout")
