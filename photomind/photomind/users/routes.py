@@ -37,7 +37,7 @@ def login():
         if attempt <= 0:
             flash('You have used your limited attemts to login.')
             session.permanent = False
-            return redirect(url_for('newpassword'))
+            return redirect(url_for('users.newpassword'))
         elif user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
@@ -57,8 +57,18 @@ def login():
 @users.route("/newpassword", methods=['GET', 'POST'])
 def newpassword():
     form = NewPasswordForm()
-    #if form.validate_on_submit():
-
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if bcrypt.check_password_hash(user.answer, form.answer.data) and user.question == form.question.data:
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            user.password = hashed_password
+            db.session.commit()
+            flash('Your password has been updated! You are now able to log in', 'success')
+            return redirect(url_for('users.login'))
+        else:
+            flash('New password unsuccesful. Please check you email, question and answer.', 'error')
+            return redirect(url_for('users.newpassword'))
+    return render_template('newpassword.html', title="New Password", form=form)
 
 @users.route("/logout")
 def logout():
