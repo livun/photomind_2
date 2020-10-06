@@ -2,7 +2,11 @@ from flask import render_template, url_for, flash, redirect, request, Blueprint,
 from flask_login import login_user, current_user, logout_user, login_required
 from photomind import db, bcrypt
 from photomind.models import User, Post
+<<<<<<< HEAD
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
+=======
+from photomind.users.forms import RegistrationForm, LoginForm, UpdateAccountForm
+>>>>>>> 2be31bc5a8aca2e622fae05fc0fc705961274e21
 from photomind.users.utils import save_picture
 from datetime import timedelta
 from photomind.main.routes import session
