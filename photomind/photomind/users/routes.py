@@ -6,6 +6,7 @@ from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountFor
                                    RequestResetForm, ResetPasswordForm)
 from photomind.users.utils import save_picture, send_reset_email
 from datetime import timedelta
+from photomind.main.routes import session
 
 users = Blueprint('users', __name__)
 
@@ -30,14 +31,27 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = LoginForm()
+    attempt= session.get('attempt')
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if attempt <= 0:
+            flash('You have used your limited attemts to login.')
+            session.permanent = False
+            return redirect(url_for('main.home'))
+        elif user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
+        attempt -= 1
+        session['attempt']=attempt
+        print(attempt,flush=True)
+        if attempt==1:
+            client_ip= session.get('client_ip')
+            flash('This is your last attempt, %s will be blocked for 24hr, Attempt %d of 5'  % (client_ip,attempt), 'error')
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Login Unsuccessful. Please check email and password, Attempts %d of 5'  % attempt, 'error')
+        #else:
+            #flash('Login Unsuccessful. Please check email and password', 'danger')
         session.permanent = True
     return render_template('login.html', title='Login', form=form)
 

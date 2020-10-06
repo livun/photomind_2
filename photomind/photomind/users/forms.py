@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
 from photomind.models import User
@@ -14,6 +14,11 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
+    question = SelectField('Questions', choices = ["What was the house number and street name you lived in as a child?",
+            "What were the last four digits of your childhood telephone number?",
+            "What primary school did you attend?", "In what town or city was your first full time job?",
+            "What is the middle name of your oldest child?"], validators=[DataRequired()])
+    answer = StringField('Aswer', validators=[DataRequired()])
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
@@ -72,3 +77,18 @@ class ResetPasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+
+class NewPasswordForm(FlaskForm):
+    email = StringField('Email',
+                    validators=[DataRequired(), Email()])
+    question = SelectField('Questions', choices = ["What was the house number and street name you lived in as a child?",
+                "What were the last four digits of your childhood telephone number?",
+                "What primary school did you attend?", "In what town or city was your first full time job?"
+                "What is the middle name of your oldest child?"], validators=[DataRequired()])
+    answer = PasswordField('Aswer', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = StringField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')
+
