@@ -29,12 +29,18 @@ class RegistrationForm(FlaskForm):
         for char in username.data:
             for i in range(len(avoid)):
                 if avoid[i] == char:
-                    raise ValidationError('Spesical chcaracters in username is not allowed')
+                    raise ValidationError('Special characters in username is not allowed')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
+
+    def validate_password(self, password):
+        for char in password.data:
+            for i in range(len(avoid)):
+                if avoid[i] == char:
+                    raise ValidationError('Special characters in password is not allowed')
 
 
 class LoginForm(FlaskForm):
