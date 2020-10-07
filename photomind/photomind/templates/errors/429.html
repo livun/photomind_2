@@ -2,6 +2,8 @@
 {% block content %}
     <div class="content-section">
         <h1>To Many Requests (429)</h1>
-        <p> Access denied.</p>
-    </div>
+        <p> Access denied. If you have forgotten you password, try resetting after 5 minutes.</p>
+        <small class="text-muted ml-2">
+            <a href="{{ url_for('users.newpassword') }}">Forgot Password?</a>
+        </small>
 {% endblock content %}

@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, Flask, session
 from flask_login import login_user, current_user, logout_user, login_required
-from photomind import db, bcrypt
+from photomind import db, bcrypt, limiter
 from photomind.models import User, Post
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
 from photomind.users.utils import save_picture
@@ -10,7 +10,8 @@ users = Blueprint('users', __name__)
 
 
 @users.route("/register", methods=['GET', 'POST'])
-def register():
+@limiter.limit('5/day') # Only get to access the register-page from you IP 5 times a day, which means that yuou cannot making several account
+def register(): 
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RegistrationForm()
@@ -26,6 +27,7 @@ def register():
 
 
 @users.route("/login", methods=['GET', 'POST'])
+@limiter.limit('50/day; 20/hour; 5/minute')
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -43,6 +45,7 @@ def login():
 
 
 @users.route("/newpassword", methods=['GET', 'POST'])
+@limiter.limit('3/day')
 def newpassword():
     form = NewPasswordForm()
     if form.validate_on_submit():
