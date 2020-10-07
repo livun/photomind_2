@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, Flask, session
-from flask_login import login_user, current_user, logout_user, login_required
+from flask_login import login_user, current_user, logout_user, login_required, fresh_login_required
 from photomind import db, bcrypt, limiter
 from photomind.models import User, Post
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
@@ -35,7 +35,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
+            login_user(user, remember=form.remember.data, duration=timedelta(days=30))
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
@@ -45,7 +45,7 @@ def login():
 
 
 @users.route("/newpassword", methods=['GET', 'POST'])
-@limiter.limit('3/day')
+@limiter.limit('1/day')
 def newpassword():
     form = NewPasswordForm()
     if form.validate_on_submit():
@@ -68,7 +68,7 @@ def logout():
 
 
 @users.route("/account", methods=['GET', 'POST'])
-@login_required
+@fresh_login_required
 def account():
     form = UpdateAccountForm()
     if form.validate_on_submit():
