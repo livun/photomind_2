@@ -8,12 +8,17 @@ from photomind.posts.forms import PostForm
 
 posts = Blueprint('posts', __name__)
 
+avoid = ["=", "/", "<", ">", "&", '"', "#", "-", ";", "(", ")", "@", "\\"]
 
 @posts.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
+        #for char in form.content.data:
+        #    for i in range(len(avoid)):
+        #        raise UnicodeError("Spesical chcaracters is not allowed") 
+                #form.content.data = form.content.data.replace(avoid[i], " ")
         post = Post(title=form.title.data, content=form.content.data, author=current_user)
         db.session.add(post)
         db.session.commit()

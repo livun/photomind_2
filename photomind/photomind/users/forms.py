@@ -4,6 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
 from photomind.models import User
+from photomind.posts.forms import avoid
 
 
 class RegistrationForm(FlaskForm):
@@ -11,7 +12,7 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=20)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     question = SelectField('Questions', choices = ["What was the house number and street name you lived in as a child?",
@@ -25,6 +26,10 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError('That username is taken. Please choose a different one.')
+        for char in username.data:
+            for i in range(len(avoid)):
+                if avoid[i] == char:
+                    raise ValidationError('Spesical chcaracters in username is not allowed')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -45,7 +50,7 @@ class UpdateAccountForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Update')
 
     def validate_username(self, username):
@@ -69,7 +74,7 @@ class NewPasswordForm(FlaskForm):
                 "What primary school did you attend?", "In what town or city was your first full time job?",
                 "What is the middle name of your oldest child?"], validators=[DataRequired()])
     answer = StringField('Aswer', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=10)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')

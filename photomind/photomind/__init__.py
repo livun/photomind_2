@@ -16,8 +16,17 @@ limiter = Limiter()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
+<<<<<<< HEAD
     app.config.from_object(Config)
     
+=======
+    app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+    #app.config.from_object(Config)
+    app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
+    app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB max-limit
+
+>>>>>>> 3694e24b251c646fe7eae11f22b1042f3cef7a53
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
