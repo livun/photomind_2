@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from photomind.config import Config
-from datetime import timedelta
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 
 db = SQLAlchemy()
@@ -11,19 +12,17 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-    #app.config.from_object(Config)
-    app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
-    app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB max-limit
-
+    app.config.from_object(Config)
+    
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    limiter.init_app(app)
 
     from photomind.users.routes import users
     from photomind.posts.routes import posts
