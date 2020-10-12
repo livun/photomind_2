@@ -1,5 +1,6 @@
 from flask import render_template, request, Blueprint
 from photomind.models import Post
+from photomind import basic_auth
 
 main = Blueprint('main', __name__)
 

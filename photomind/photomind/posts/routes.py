@@ -1,25 +1,21 @@
 
 from flask import (render_template, url_for, flash,
-                   redirect, request, abort, Blueprint)
+                   redirect, request, abort, Blueprint, escape)
 from flask_login import current_user, login_required
 from photomind import db
 from photomind.models import Post
 from photomind.posts.forms import PostForm
 
+
 posts = Blueprint('posts', __name__)
 
-avoid = ["=", "/", "<", ">", "&", '"', "#", "-", ";", "(", ")", "@", "\\"]
 
 @posts.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        #for char in form.content.data:
-        #    for i in range(len(avoid)):
-        #        raise UnicodeError("Spesical chcaracters is not allowed") 
-                #form.content.data = form.content.data.replace(avoid[i], " ")
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        post = Post(title=escape(form.title.data), content=escape(form.content.data), author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -43,8 +39,8 @@ def update_post(post_id):
         abort(403)
     form = PostForm()
     if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
+        post.title = escape(form.title.data)
+        post.content = escape(form.content.data)
         db.session.commit()
         flash('Your post has been updated!', 'success')
         return redirect(url_for('posts.post', post_id=post.id))

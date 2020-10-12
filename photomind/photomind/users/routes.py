@@ -5,6 +5,7 @@ from photomind.models import User, Post
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
 from photomind.users.utils import save_picture
 from datetime import timedelta
+from flask import escape
 
 users = Blueprint('users', __name__)
 
@@ -16,9 +17,9 @@ def register():
         return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        hashed_answer = bcrypt.generate_password_hash(form.answer.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password, question=form.question.data, answer=hashed_answer)
+        hashed_password = bcrypt.generate_password_hash(escape(form.password.data)).decode('utf-8')
+        hashed_answer = bcrypt.generate_password_hash(escape(form.answer.data)).decode('utf-8')
+        user = User(username=escape(form.username.data), email=form.email.data, password=hashed_password, question=form.question.data, answer=hashed_answer)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -34,7 +35,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password, escape(form.password.data)):
             login_user(user, remember=form.remember.data, duration=timedelta(days=30))
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
@@ -50,8 +51,8 @@ def newpassword():
     form = NewPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if bcrypt.check_password_hash(user.answer, form.answer.data) and user.question == form.question.data:
-            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        if bcrypt.check_password_hash(user.answer, escape(form.answer.data)) and user.question == form.question.data:
+            hashed_password = bcrypt.generate_password_hash(escape(form.password.data)).decode('utf-8')
             user.password = hashed_password
             db.session.commit()
             flash('Your password has been updated! You are now able to log in', 'success')
