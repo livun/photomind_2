@@ -5,5 +5,5 @@ class Config:
    SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
    PERMANENT_SESSION_LIFETIME =  timedelta(minutes=5)
    MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4MB max-limit
-   BASIC_AUTH_USERNAME = 'john'
-   BASIC_AUTH_PASSWORD = 'matrix'
+   #BASIC_AUTH_USERNAME = 'john'
+   #BASIC_AUTH_PASSWORD = 'matrix'

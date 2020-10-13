@@ -3,18 +3,32 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 from photomind import db, login_manager
 from flask_login import UserMixin
-from flask_admin.contrib.sqla import ModelView
-from photomind import admin
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship, backref
+from flask_security import UserMixin, RoleMixin
+
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+class RolesUsers(db.Model):
+    __tablename__ = 'roles_users'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column('user_id', db.Integer(), ForeignKey('user.id'))
+    role_id = db.Column('role_id', db.Integer(), ForeignKey('role.id'))
+
+class Role(db.Model, RoleMixin):
+    __tablename__ = 'role'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+
 # Ny bruker inn i databasen, hva som må fylles ut osv
 class User(db.Model, UserMixin):
     __table__name = 'Users'
-    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -22,21 +36,16 @@ class User(db.Model, UserMixin):
     question = db.Column(db.Integer, nullable=False)
     answer = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    last_login_at = db.Column(db.DateTime())
+    current_login_at = db.Column(db.DateTime())
+    last_login_ip = db.Column(db.String(100))
+    current_login_ip = db.Column(db.String(100))
+    login_count = db.Column(db.Integer)
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary='roles_users', backref=backref('users', lazy='dynamic'))
     posts = db.relationship('Post', backref='author', lazy=True)
 
-    # For å reset password
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    @staticmethod
-    def verify_reset_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
@@ -53,6 +62,3 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
-
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Post, db.session))
