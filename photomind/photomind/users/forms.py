@@ -19,7 +19,7 @@ class RegistrationForm(FlaskForm):
             "What were the last four digits of your childhood telephone number?",
             "What primary school did you attend?", "In what town or city was your first full time job?",
             "What is the middle name of your oldest child?"], validators=[DataRequired()])
-    answer = StringField('Aswer', validators=[DataRequired()])
+    answer = StringField('Answer', validators=[DataRequired()])
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
@@ -29,7 +29,7 @@ class RegistrationForm(FlaskForm):
         for char in username.data:
             for i in range(len(avoid)):
                 if avoid[i] == char:
-                    raise ValidationError('Special characters in username is not allowed')
+                    raise ValidationError('Special characters in username is not allowed.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -40,7 +40,7 @@ class RegistrationForm(FlaskForm):
         for char in password.data:
             for i in range(len(avoid)):
                 if avoid[i] == char:
-                    raise ValidationError('Special characters in password is not allowed')
+                    raise ValidationError('Special characters in password is not allowed.')
 
 
 class LoginForm(FlaskForm):
@@ -51,13 +51,20 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
+
+
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Update')
+
+
+
+
 
     def validate_username(self, username):
         if username.data != current_user.username:

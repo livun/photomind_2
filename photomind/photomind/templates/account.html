@@ -21,7 +21,7 @@
                             {% for error in form.username.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
-                        </div>
+                        </div>''
                     {% else %}
                         {{ form.username(class="form-control form-control-lg") }}
                     {% endif %}
@@ -39,7 +39,7 @@
                         {{ form.email(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
-                <div class="form-group">
+                <div class="form-group" enctype="multipart/form-data">
                     {{ form.picture.label() }}
                     {{ form.picture(class="form-control-file") }}
                     {% if form.picture.errors %}
