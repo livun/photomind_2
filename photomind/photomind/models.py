@@ -1,6 +1,6 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, escape
 from photomind import db, login_manager
 from flask_login import UserMixin
 from flask_admin.contrib.sqla import ModelView
@@ -13,8 +13,6 @@ def load_user(user_id):
 
 # Ny bruker inn i databasen, hva som må fylles ut osv
 class User(db.Model, UserMixin):
-    __table__name = 'Users'
-    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -43,8 +41,6 @@ class User(db.Model, UserMixin):
 
 # Ny post i databasen
 class Post(db.Model):
-    __table__name = 'Post'
-    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -56,3 +52,6 @@ class Post(db.Model):
 
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Post, db.session))
+
+
+        
