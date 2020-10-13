@@ -1,6 +1,6 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, escape
 from photomind import db, login_manager
 from flask_login import UserMixin
 from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey
@@ -52,8 +52,6 @@ class User(db.Model, UserMixin):
 
 # Ny post i databasen
 class Post(db.Model):
-    __table__name = 'Post'
-    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
