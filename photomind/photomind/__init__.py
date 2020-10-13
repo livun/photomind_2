@@ -5,7 +5,6 @@ from flask_login import LoginManager
 from photomind.config import Config
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_security import Security, SQLAlchemyUserDatastore
 from flask_talisman import Talisman
 
 
@@ -15,7 +14,6 @@ login_manager = LoginManager()
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
 limiter = Limiter(key_func=get_remote_address)
-security = Security()
 
 
 talisman = Talisman()
@@ -54,9 +52,5 @@ def create_app(config_class=Config):
     app.register_blueprint(posts)
     app.register_blueprint(main)
     app.register_blueprint(errors)
-
-    from photomind.models import User, Role
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security.init_app(app, user_datastore)
 
     return app
