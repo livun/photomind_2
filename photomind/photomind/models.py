@@ -1,7 +1,11 @@
 from datetime import datetime
-from flask import current_app
-from photomind import db, login_manager
-from flask_login import UserMixin
+from flask import current_app, url_for, redirect, session
+from photomind import db, login_manager, admin
+from flask_login import UserMixin, current_user, login_user, logout_user, login_required, fresh_login_required
+from photomind.config import Config
+from flask_admin import AdminIndexView
+from flask_admin.contrib.sqla import ModelView
+
 
 
 @login_manager.user_loader
@@ -19,12 +23,8 @@ class User(db.Model, UserMixin):
     answer = db.Column(db.String(30), nullable=False)    
     posts = db.relationship('Post', backref='author', lazy=True)
     last_login_at = db.Column(db.DateTime)
-    current_login_at = db.Column(db.DateTime)
     last_login_ip = db.Column(db.String(100))
-    current_login_ip = db.Column(db.String(100))
-    login_count = db.Column(db.Integer)
     active = db.Column(db.Boolean)
-    confirmed_at = db.Column(db.DateTime)
     role = db.Column(db.String(10), nullable=False, default='user')
 
     def __repr__(self):
@@ -40,3 +40,29 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+
+
+#class BlogMindModelView(ModelView):
+#    def is_accessible(self):
+#        return current_user.is_authenticated
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+            return current_user.role == 'admin'
+             
+        
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('users.login'))
+
+#class MyAdminIndexView(AdminIndexView):
+ #   def is_authenticated(self):
+  #      return current_user.is_authenticated
+
+
+#admin.add_view(ModelView(User, db.session))
+#admin.add_view(ModelView(Post, db.session))
+admin.add_view(MyModelView(User, db.session))
+admin.add_view(MyModelView(Post, db.session))
+
+

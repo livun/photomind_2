@@ -11,3 +11,5 @@ class Config:
    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
    UPLOAD_FOLDER = 'static/profile_pics'
+ 
+   

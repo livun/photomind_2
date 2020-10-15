@@ -1,18 +1,17 @@
 import os
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from PIL import Image
-
 from flask import render_template, url_for, flash, redirect, request, Blueprint, Flask, session, send_from_directory, current_app
 from wtforms import Form
 from flask_login import login_user, current_user, logout_user, login_required, fresh_login_required
 from photomind import db, bcrypt, limiter
 from photomind.models import User, Post
 from photomind.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm, NewPasswordForm)
-from photomind.users.utils import save_picture, allowed_file
-from datetime import timedelta
+from photomind.users.utils import allowed_file
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from photomind.config import Config
+from flask_limiter.util import get_remote_address
 
 
 from flask import escape
@@ -47,6 +46,10 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, escape(form.password.data)):
             login_user(user, remember=form.remember.data, duration=timedelta(days=30))
+            user.last_login_at = datetime.now()
+            user.last_login_ip = get_remote_address()
+            user.active = True 
+            db.session.commit()
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
@@ -75,6 +78,8 @@ def newpassword():
 @users.route("/logout")
 def logout():
     logout_user()
+    user.active = False
+    db.session.commit()
     return redirect(url_for('main.home'))
 
 
