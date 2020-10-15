@@ -18,7 +18,7 @@ class RegistrationForm(FlaskForm):
             "What were the last four digits of your childhood telephone number?",
             "What primary school did you attend?", "In what town or city was your first full time job?",
             "What is the middle name of your oldest child?"], validators=[DataRequired()])
-    answer = StringField('Aswer', validators=[DataRequired()])
+    answer = StringField('Answer', validators=[DataRequired()])
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
@@ -40,13 +40,20 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
+
+
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Update')
+
+
+
+
 
     def validate_username(self, username):
         if username.data != current_user.username:
