@@ -77,9 +77,10 @@ def newpassword():
 
 @users.route("/logout")
 def logout():
-    logout_user()
+    user = current_user
     user.active = False
     db.session.commit()
+    logout_user()
     return redirect(url_for('main.home'))
 
 
