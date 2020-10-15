@@ -44,8 +44,12 @@ def create_app(config_class=Config):
     # If this optional parameter is specified, this rule applies to all of the site’s subdomains as well.
     talisman.init_app(
         app, 
-        strict_transport_security=31536000,         
-        content_security_policy=csp
+        strict_transport_security_preload=True,
+        strict_transport_security_max_age=31536000,
+        strict_transport_security_include_subdomains=True,
+        content_security_policy=csp,
+        frame_options="DENY",
+        #referrer_policy="strict-origin-when-cross-origin"
     )
 
     from photomind.users.routes import users
