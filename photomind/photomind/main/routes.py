@@ -15,3 +15,9 @@ def home():
 @basic_auth.required
 def admin_view():
     return render_template('admin.html')
+
+
+#if __name__ == "__main__":
+#    main.run(ssl_context='adhoc')
+
+# flask run --cert=adhoc
