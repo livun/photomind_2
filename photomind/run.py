@@ -1,7 +1,7 @@
 from photomind import create_app
-
 from flask import Flask
 from flask_sslify import SSLify
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'XYZ')
