@@ -5,9 +5,8 @@ from flask_login import LoginManager
 from photomind.config import Config
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_admin import Admin
-from flask_basicauth import BasicAuth
 from flask_talisman import Talisman
+from flask_admin import Admin
 
 
 db = SQLAlchemy()
@@ -17,7 +16,7 @@ login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
 limiter = Limiter(key_func=get_remote_address)
 admin = Admin()
-basic_auth = BasicAuth()
+
 talisman = Talisman()
 csp = {
     'default-src': [
@@ -35,15 +34,22 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     limiter.init_app(app)
+    
+    #from photomind.models import MyAdminIndexView
     admin.init_app(app)
-    basic_auth.init_app(app)
+
+  
 
     # The time, in seconds, that the browser should remember that this site is only to be accessed using HTTPS.
     # If this optional parameter is specified, this rule applies to all of the site’s subdomains as well.
     talisman.init_app(
         app, 
-        strict_transport_security=31536000,         
-        content_security_policy=csp
+        strict_transport_security_preload=True,
+        strict_transport_security_max_age=31536000,
+        strict_transport_security_include_subdomains=True,
+        content_security_policy=csp,
+        frame_options="DENY",
+        #referrer_policy="strict-origin-when-cross-origin"
     )
 
     from photomind.users.routes import users

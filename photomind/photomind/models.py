@@ -1,45 +1,36 @@
 from datetime import datetime
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app, escape
-from photomind import db, login_manager
-from flask_login import UserMixin
+from flask import current_app, url_for, redirect, session
+from photomind import db, login_manager, admin
+from flask_login import UserMixin, current_user, login_user, logout_user, login_required, fresh_login_required
+from photomind.config import Config
+from flask_admin import AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from photomind import admin
+
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Ny bruker inn i databasen, hva som må fylles ut osv
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    question = db.Column(db.Integer, nullable=False)
-    answer = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    question = db.Column(db.Integer, nullable=False)
+    answer = db.Column(db.String(30), nullable=False)    
     posts = db.relationship('Post', backref='author', lazy=True)
-
-    # For å reset password
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    @staticmethod
-    def verify_reset_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
+    last_login_at = db.Column(db.DateTime)
+    last_login_ip = db.Column(db.String(100))
+    active = db.Column(db.Boolean)
+    role = db.Column(db.String(10), nullable=False, default='user')
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
-# Ny post i databasen
+
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -50,8 +41,28 @@ class Post(db.Model):
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
 
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Post, db.session))
 
+#class BlogMindModelView(ModelView):
+#    def is_accessible(self):
+#        return current_user.is_authenticated
 
+class MyModelView(ModelView):
+    def is_accessible(self):
+            return current_user.role == 'admin'
+             
         
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('users.login'))
+
+#class MyAdminIndexView(AdminIndexView):
+ #   def is_authenticated(self):
+  #      return current_user.is_authenticated
+
+
+#admin.add_view(ModelView(User, db.session))
+#admin.add_view(ModelView(Post, db.session))
+admin.add_view(MyModelView(User, db.session))
+admin.add_view(MyModelView(Post, db.session))
+
+
