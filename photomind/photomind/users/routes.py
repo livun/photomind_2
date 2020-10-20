@@ -121,7 +121,7 @@ def account():
                 picture_path = os.path.join(current_app.root_path, 'static/profile_pics', filename)
                 file.save(picture_path)
                 current_user.image_file = filename
-        current_user.username = form.username.data
+        current_user.username = escape(form.username.data)
         current_user.email = form.email.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
