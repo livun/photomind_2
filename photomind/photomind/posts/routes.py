@@ -5,6 +5,8 @@ from flask_login import current_user, login_required
 from photomind import db
 from photomind.models import Post
 from photomind.posts.forms import PostForm
+from photomind.nocache import nocache
+
 
 
 posts = Blueprint('posts', __name__)
@@ -12,6 +14,7 @@ posts = Blueprint('posts', __name__)
 
 @posts.route("/post/new", methods=['GET', 'POST'])
 @login_required
+@nocache
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
@@ -26,6 +29,7 @@ def new_post():
 
 @posts.route("/post/<int:post_id>")
 @login_required
+@nocache
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     return render_template('post.html', title=post.title, post=post)
@@ -33,6 +37,7 @@ def post(post_id):
 
 @posts.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
 @login_required
+@nocache
 def update_post(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
@@ -53,6 +58,7 @@ def update_post(post_id):
 
 @posts.route("/post/<int:post_id>/delete", methods=['POST'])
 @login_required
+@nocache
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:

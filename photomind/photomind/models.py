@@ -7,7 +7,6 @@ from flask_admin import AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
