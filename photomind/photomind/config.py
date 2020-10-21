@@ -12,7 +12,3 @@ class Config:
    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
    UPLOAD_FOLDER = 'static/profile_pics'
-
-   # Whoosh does not work on Heroku
-   WHOOSH_ENABLED = os.environ.get('HEROKU') is None
-   
