@@ -35,7 +35,6 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     limiter.init_app(app)
     
-    #from photomind.models import MyAdminIndexView
     admin.init_app(app)
 
   
