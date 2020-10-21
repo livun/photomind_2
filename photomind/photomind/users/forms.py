@@ -15,7 +15,7 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     question = SelectField('Questions', choices = ["What was the house number and street name you lived in as a child?",
-            "What were the last four digits of your childhood telephone number?",
+            "    “What is your oldest cousin’s first name?”?",
             "What primary school did you attend?", "In what town or city was your first full time job?",
             "What is the middle name of your oldest child?"], validators=[DataRequired()])
     answer = StringField('Answer', validators=[DataRequired()])
