@@ -5,7 +5,15 @@ from flask_login import UserMixin, current_user, login_user, logout_user, login_
 from photomind.config import Config
 from flask_admin import AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+from config import WHOOSH_ENABLED
 
+enable_search = WHOOSH_ENABLED
+if enable_search:
+    import flask_whooshalchemy as whooshalchemy
+
+# ...
+if enable_search:
+    whooshalchemy.whoosh_index(app, Post)
 
 
 @login_manager.user_loader
