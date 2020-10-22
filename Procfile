@@ -1,1 +1,2 @@
-web: gunicorn run:app --log-file=-
+web: python -c "from flasktutorial import db, create_app()"; gunicorn run:app
+
