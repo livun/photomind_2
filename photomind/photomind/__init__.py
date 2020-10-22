@@ -24,6 +24,9 @@ csp = {
         'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'
     ]
 }
+feature_policy = {
+    'geolocation': '\'none\''
+}
 
 
 def create_app(config_class=Config):
@@ -48,7 +51,7 @@ def create_app(config_class=Config):
         strict_transport_security_include_subdomains=True,
         content_security_policy=csp,
         frame_options="DENY",
-        #referrer_policy="strict-origin-when-cross-origin"
+        feature_policy=feature_policy
     )
 
     from photomind.users.routes import users

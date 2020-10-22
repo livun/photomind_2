@@ -11,7 +11,7 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=20)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=16, max=64)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     question = SelectField('Questions', choices = ["What was the house number and street name you lived in as a child?",
@@ -76,7 +76,7 @@ class NewPasswordForm(FlaskForm):
                 "What primary school did you attend?", "In what town or city was your first full time job?",
                 "What is the middle name of your oldest child?"], validators=[DataRequired()])
     answer = StringField('Aswer', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=10)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=16, max=64)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')

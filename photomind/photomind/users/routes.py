@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from photomind.config import Config
 from flask_limiter.util import get_remote_address
+from photomind.nocache import nocache
 
 
 from flask import escape
@@ -106,6 +107,7 @@ def upload_file():
 
 @users.route("/account", methods=['GET', 'POST'])
 @fresh_login_required
+@nocache
 def account():
     form = UpdateAccountForm()
     if form.validate_on_submit():
@@ -119,7 +121,7 @@ def account():
                 picture_path = os.path.join(current_app.root_path, 'static/profile_pics', filename)
                 file.save(picture_path)
                 current_user.image_file = filename
-        current_user.username = form.username.data
+        current_user.username = escape(form.username.data)
         current_user.email = form.email.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
@@ -136,6 +138,7 @@ def account():
 
 @users.route("/user/<string:username>")
 @login_required
+@nocache
 def user_posts(username):
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
