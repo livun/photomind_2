@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
     last_login_at = db.Column(db.DateTime)
     last_login_ip = db.Column(db.String(100))
     active = db.Column(db.Boolean)
-    role = db.Column(db.String(10), nullable=False, default='admin')
+    role = db.Column(db.String(10), nullable=False, default='user')
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
