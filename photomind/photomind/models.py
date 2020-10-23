@@ -41,9 +41,6 @@ class Post(db.Model):
         return f"Post('{self.title}', '{self.date_posted}')"
 
 
-#class BlogMindModelView(ModelView):
-#    def is_accessible(self):
-#        return current_user.is_authenticated
 
 class MyModelView(ModelView):
     def is_accessible(self):
@@ -52,15 +49,8 @@ class MyModelView(ModelView):
         
 
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('users.login'))
+        return redirect(url_for('users.login', next=request.url))
 
-#class MyAdminIndexView(AdminIndexView):
- #   def is_authenticated(self):
-  #      return current_user.is_authenticated
-
-
-#admin.add_view(ModelView(User, db.session))
-#admin.add_view(ModelView(Post, db.session))
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Post, db.session))
 
