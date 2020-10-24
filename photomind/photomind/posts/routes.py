@@ -56,7 +56,7 @@ def update_post(post_id):
                            form=form, legend='Update Post')
 
 
-@posts.route("/post/<int:post_id>/delete", methods=['POST'])
+@posts.route("/post/<int:post_id>/delete", methods=['GET'])
 @login_required
 @nocache
 def delete_post(post_id):
@@ -67,3 +67,15 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('main.home'))
+
+@posts.after_request
+def headers(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self' https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '0'
+    response.headers['X-Permitted-Cross-Domain-Policies']='none'
+    response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
+    return response
+

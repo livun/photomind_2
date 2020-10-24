@@ -148,6 +148,17 @@ def user_posts(username):
     return render_template('user_posts.html', posts=posts, user=user)
 
     
+@users.after_request
+def headers(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self' https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '0'
+    response.headers['X-Permitted-Cross-Domain-Policies']='none'
+    response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
+    return response
+
 
 
 
