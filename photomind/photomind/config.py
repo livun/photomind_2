@@ -3,7 +3,9 @@ import os
 
 class Config:
    SECRET_KEY = '5791628bb0b13ce0c676dfde280ba245'
-   SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
+
+   SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+   
    PERMANENT_SESSION_LIFETIME =  timedelta(minutes=20)
    
    MAX_CONTENT_LENGTH = 1024 * 1024  # 1MB max-limit
